@@ -1,0 +1,52 @@
+﻿@model IEnumerable<Bank_transactions__system_1.Models.BankBranch>
+
+@{
+    ViewData["Title"] = "Branch Management";
+}
+
+<h1 class="display-6 fw-bold text-primary mb-4">Branch List</h1>
+
+<p>
+    <a class="btn btn-info mb-3" asp-action="Create">
+        <i class="bi bi-plus-circle"></i> Create New Branch
+    </a>
+</p>
+
+<form method="get" asp-action="Index" class="mb-3 d-flex" role="search">
+    <input type="text" name="search" class="form-control me-2" placeholder="Search Branch Name" value="@Context.Request.Query["search"]" />
+    <button type="submit" class="btn btn-outline-primary">Search</button>
+</form>
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="4" class="text-center text-muted">No branches found.</td>
+    </tr>
+}
+
+<table class="table table-bordered table-striped table-hover shadow-sm">
+    <thead class="table-dark text-center">
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.First().BranchName)</th>
+            <th>@Html.DisplayNameFor(model => model.First().CreditLimit)</th>
+            <th>@Html.DisplayNameFor(model => model.First().DebitLimit)</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody class="text-center">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.BranchName)</td>
+                <td>₹@item.CreditLimit.ToString("N2")</td>
+                <td>₹@item.DebitLimit.ToString("N2")</td>
+                <td>
+                    <a class="btn btn-outline-primary btn-sm" asp-action="Edit" asp-route-id="@item.Id">
+                        <i class="bi bi-pencil-square"></i> Edit
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />

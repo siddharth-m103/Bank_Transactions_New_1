@@ -1,0 +1,107 @@
+﻿@model Bank_transactions__system_1.Models.BankTransaction
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1 class="text-primary mb-4">Bank Transactions</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="BankBranchId" class="form-label fw-bold"></label>
+                <select asp-for="BankBranchId" class="form-select" asp-items="ViewBag.Branches">
+                    <option value="">-- Select Branch --</option>
+                </select>
+                <span asp-validation-for="BankBranchId" class="text-danger"></span>
+            </div>
+
+            <div class="mb-2">
+                <label class="fw-bold">Credit Limit:</label>
+                <span id="creditLimitDisplay" class="text-success ms-2">₹0</span>
+                <input type="hidden" id="HiddenCreditLimit" />
+            </div>
+
+            <div class="mb-4">
+                <label class="fw-bold">Debit Limit:</label>
+                <span id="debitLimitDisplay" class="text-danger ms-2">₹0</span>
+                <input type="hidden" id="HiddenDebitLimit" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Amount" class="form-label fw-bold"></label>
+                <input asp-for="Amount" class="form-control id="Amount" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="TransactionTypeId" class="form-label fw-bold"></label>
+                <select asp-for="TransactionTypeId" class="form-select" asp-items="ViewBag.TransactionTypes">
+                    <option value="">-- Select Transaction Type --</option>
+                </select>
+                <span asp-validation-for="TransactionTypeId" class="text-danger"></span>
+            </div>
+
+            @* <div class="mb-4"> *@
+            @*     <label asp-for="TransactionDate" class="form-label fw-bold"></label> *@
+            @*     <input asp-for="TransactionDate" class="form-control" /> *@
+            @*     <span asp-validation-for="TransactionDate" class="text-danger"></span> *@
+            @* </div> *@
+
+            <div class="mb-3">
+                <input type="submit" value="Create" class="btn btn-primary me-2" />
+                @* <a class="btn btn-info text-white" asp-controller="Transaction" asp-action="Index">Back to List</a> *@
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a class="btn btn-info" asp-controller="Branch" asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        $('#BankBranchId').on('change', function () {
+            var branchId = $(this).val();
+            if (branchId) {
+                $.ajax({
+                    url: '/Branch/GetBranchLimits?id=' + branchId,
+                    method: 'GET',
+                    success: function (data) {
+                        $('#creditLimitDisplay').text("₹" + data.creditLimit);
+                        $('#debitLimitDisplay').text("₹" + data.debitLimit);
+                        $('#HiddenCreditLimit').val(data.creditLimit);
+                        $('#HiddenDebitLimit').val(data.debitLimit);
+                    },
+                    error: function () {
+                        alert("Could not load branch limits");
+                    }
+                });
+            }
+        });
+
+        // Prevent submitting if amount exceeds limit
+        $('form').on('submit', function (e) {
+            var amount = parseFloat($('#Amount').val());
+            var creditLimit = parseFloat($('#HiddenCreditLimit').val());
+            var debitLimit = parseFloat($('#HiddenDebitLimit').val());
+            var selectedTypeText = $('#TransactionTypeId option:selected').text().trim();
+
+            if (selectedTypeText === "Credit" && amount > creditLimit) {
+                e.preventDefault();
+                alert("Amount exceeds Credit Limit (₹" + creditLimit + ")");
+            }
+
+            if (selectedTypeText === "Debit" && amount > debitLimit) {
+                e.preventDefault();
+                alert("Amount exceeds Debit Limit (₹" + debitLimit + ")");
+            }
+        });
+    </script>
+}

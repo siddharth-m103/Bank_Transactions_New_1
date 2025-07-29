@@ -1,0 +1,66 @@
+﻿@model Bank_transactions__system_1.Models.BankBranch
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1 class="text-primary text-center">Create Bank Branches</h1>
+
+<h4>BankBranch</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="BranchName" class="form-label fw-bold mt-2"></label>
+                <input asp-for="BranchName" class="form-control mb-3" />
+                <span asp-validation-for="BranchName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CreditLimit" class="form-label fw-bold mt-2"></label>
+                <input asp-for="CreditLimit" class="form-control mb-3" />
+                <span asp-validation-for="CreditLimit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DebitLimit" class="form-label fw-bold mt-2"></label>
+                <input asp-for="DebitLimit" class="form-control mb-3" />
+                <span asp-validation-for="DebitLimit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary me-2">Create</button>
+                <a class="btn btn-secondary" asp-controller="Branch" asp-action="Index">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+           
+        $('#BranchId').on('change', function () {
+            var branchId = $(this).val();
+            if (branchId) {
+                $.ajax({
+                    url: '/Branch/GetBranchLimits?id=' + branchId,
+                    method: 'GET',
+                    success: function (data) {
+                        // Show limits or store them in hidden fields
+                        $('#creditLimitDisplay').text("₹" + data.creditLimit);
+                        $('#debitLimitDisplay').text("₹" + data.debitLimit);
+                        $('#HiddenCreditLimit').val(data.creditLimit);
+                        $('#HiddenDebitLimit').val(data.debitLimit);
+                    }
+                });
+            }
+        });
+    
+
+    </script>
+}
+
